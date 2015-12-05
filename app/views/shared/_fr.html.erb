@@ -1,0 +1,174 @@
+<table id ="trainer_table">
+  <%  @words.each do |word| %>
+     <tr>
+          <td><%=word %></td>
+          <td><%= link_to "larousse","http://www.larousse.fr/dictionnaires/francais/#{word}"%></td>
+          <td><%= link_to "reverso","http://www.linternaute.com/dictionnaire/fr/definition/#{word}"  %></td>
+          <td><%= link_to "wiki","http://fr.wiktionary.org/wiki/#{word}"%></td>
+          <td><%= link_to "linguee","http://www.linguee.de/deutsch-franzoesisch/search?source=franzoesisch&query=#{word}" %></td>
+          <td><%= link_to  "images","https://www.google.de/search?q=#{word}&newwindow=1&espv=2&biw=1152&bih=583&source=lnms&tbm=isch&sa=X&ved=0CAYQ_AUoAWoVChMIypXBgoCnyAIVITJyCh0Qpg1u" %></td>
+     </tr>
+  <% end %>
+</table> <br> <br>
+
+<button onclick="clicked()" id ="next"> Next</button> <br> <br> <br>
+
+<iframe src="http://www.w3schools.com" align="center"></iframe>
+
+<div id = "images-container"></div>
+
+<style>
+    td{
+        padding-left:10px;
+        padding-right: 10px;
+    }
+    table{
+        padding-left: 30%;
+        padding-top: 3%;
+        font-size: 25px;
+        font-weight: bolder;
+    }
+    button{
+        width: 90px;
+        height: 50px;
+        font-size: initial;
+    }
+    button#next{
+        margin-left: 50%;
+        font-size: 25px;
+        font-weight: bolder;
+    }
+    iframe{
+        width: 60% ;
+        height: 500px;
+        float: left;
+
+    }
+    img{
+        width:  10% ;
+        height: 10% ;
+    }
+    div#images-container{
+        margin-left: 100px ;
+    }
+</style>
+
+<script>
+     // static varaiable
+     var numberOfCorrectness = 4 ;
+     var numberOfImagesToload = 8 ;
+
+
+     // init words in Array
+    var  words = <%=raw @words.to_json %> ;
+    var currentWordIndex=0 ;
+
+    // poinst
+    var points =[];
+    for (var i = 0 ; i < words.length ;i++ ){
+        points.push(0);
+    }
+
+     // for image search
+     var imageSearch;
+
+    var dictionaris_names= ["duden","reverso","wiki","linguee", "images"];
+    var dictionaris_urls = [
+        "http://www.larousse.fr/dictionnaires/francais/#{word}",
+        "http://www.linternaute.com/dictionnaire/fr/definition/#{word}",
+        "http://fr.wiktionary.org/wiki/#{word}",
+        "http://www.linguee.de/deutsch-franzoesisch/search?source=franzoesisch&query=#{word}",
+        "https://www.google.de/search?q=#{word}&newwindow=1&espv=2&biw=1152&bih=583&source=lnms&tbm=isch&sa=X&ved=0CAYQ_AUoAWoVChMIypXBgoCnyAIVITJyCh0Qpg1u"
+    ];
+    var word_muster = "#{word}";
+
+    //
+    function getNextWordIndex(){
+        if (isWordToTrain()){
+            do{
+                var index = Math.floor((Math.random() * words.length) + 0);
+            }while (points[index]>numberOfCorrectness );
+            currentWordIndex = index;
+            return index
+        }else{
+
+             alert ("Congratulation! you have all words mastered!");
+        }
+
+
+    }
+     //
+     function isWordToTrain (){
+         for (var i =0 ; i< words.length;i++ ){
+             if (points[i]<= numberOfCorrectness){
+                 return true;
+             }
+         }
+         return false
+     }
+     //
+    function clicked (){
+        // add points to the last word
+         points[currentWordIndex] +=1;
+        // get the next word
+        var index = getNextWordIndex();
+        word = words[index];
+        text =  "<tr>";
+        text += "<td>"+word+"</td>";
+        for (var i =0  ; i < dictionaris_urls.length;i++ ){
+            var url = dictionaris_urls[i].replace(word_muster, word);
+            var dico_name = dictionaris_names[i];
+
+            text += "<td>";
+            text += "<button href='"+url+"' onclick =showTranslation('"+i+"') >"+dico_name+"</button>";
+            text += "</td>";
+        }
+        text +="</tr>";
+        document.getElementById("trainer_table").innerHTML = text;
+        console.log (points);
+
+
+    }
+    //
+    function showTranslation (dico_id){
+        //remove points to the last word
+        points[currentWordIndex] -=2;
+
+        if(dictionaris_names[dico_id] != "images") {
+            // get the urls
+            var url = dictionaris_urls[dico_id].replace(word_muster, word);
+            document.getElementsByTagName("iframe")[0].setAttribute("src", url);
+            //alert (url);
+        }else{
+            searchImage(word);
+        }
+    }
+     // search  image
+     function searchImage (word){
+         imageSearch = new google.search.ImageSearch();
+         imageSearch.setSearchCompleteCallback(this, showImages, null);
+         imageSearch.setResultSetSize(numberOfImagesToload);
+         console.log (" number of  result size : " + imageSearch.getResultSetSize())
+         imageSearch.execute(word);
+         google.search.Search.getBranding('branding');
+     }
+     // show the result from the  search
+     function showImages (){
+         if (imageSearch.results && imageSearch.results.length > 0) {
+             var results = imageSearch.results ;
+             var imagesContainer = document.getElementById("images-container");
+             // remove all existing  children nodes
+             imagesContainer.innerHTML="";
+
+             // the result
+             for(var i =0 ;i < results.length ;i++ ){
+                 // var node = results[i].html.cloneNode(true);
+                 var img = document.createElement('img');
+                 img.src = results[i].url;
+                 imagesContainer.appendChild(img);
+                 //imagesContainer.append(node);
+             }
+         }
+     }
+
+</script>

@@ -1,0 +1,9 @@
+<!-- list all languages -->
+<ul>
+
+<%  @languages.each  do | lang |  %>
+
+<li><%=link_to lang, "/trainer/#{lang}" %></li>
+<%  end %>
+
+</ul>
