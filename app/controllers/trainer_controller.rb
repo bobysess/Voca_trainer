@@ -57,6 +57,7 @@ class TrainerController < ApplicationController
                  "linguee" =>'http://www.linguee.de/deutsch-franzoesisch/search?source=franzoesisch&query=#{word}',
                  "images"=>'https://www.google.de/search?q=#{word}&newwindow=1&espv=2&biw=1152&bih=583&source=lnms&tbm=isch&sa=X&ved=0CAYQ_AUoAWoVChMIypXBgoCnyAIVITJyCh0Qpg1u'
     }
+
     @dicos = {'en'=>@en_dicos, 'de' => @de_dicos, 'fr'=>@fr_dicos};
   end
 end

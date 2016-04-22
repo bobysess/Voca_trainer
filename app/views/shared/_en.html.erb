@@ -1,5 +1,18 @@
 <!--  number of correctness s -->
-<input type="number" name ="number-of-correctness"  id="numberOfCorrectness" /> <button onclick="changeNumberOfCorrectness()"> change</button><br><br>
+<label>change the number of correctness : </label><input type="number" name ="number-of-correctness"  id="numberOfCorrectness" /> <button onclick="changeNumberOfCorrectness()"> change</button><br>
+
+<!--  change the default dictionnnaries  -->
+<label> Default Dictionnary : </label>
+<% @dicos = @dico.keys %>
+<select  id="dictionary_select">
+   <% @dicos.each_with_index do |val,index| %>
+       <option  value="<%= index %>"><%= val %></option>
+   <% end %>
+</select><br><br>
+
+
+
+<!--  show translation  -->
 <table id ="trainer_table">
   <%  @words.each do |word| %>
       <tr>
@@ -80,6 +93,7 @@
     var dictionaris_urls = <%=raw @dico.values.to_json %>;
     var word_muster = "#{word}";
 
+    var default_dicoId = 2;
     //
     function getNextWordIndex(){
         if (isWordToTrain()){
@@ -123,6 +137,7 @@
         }
         text +="</tr>";
         document.getElementById("trainer_table").innerHTML = text;
+        showTranslation(default_dicoId);
         console.log (points);
 
 
@@ -174,5 +189,11 @@
             }
         }
     }
+
+    $('#dictionary_select').change(function (){
+        default_dicoId = $(this).val();
+        console.log (default_dicoId);
+
+    })
 
 </script>
